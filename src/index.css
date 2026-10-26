@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-chocolate: #3B241C;
+    --color-cocoa-dark: #231510;
+    --color-cream: #FFF7EB;
+    --color-cream-light: #FDFBF7;
+    --color-caramel: #C9955B;
+    --color-caramel-hover: #B47F47;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .font-serif-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+  }
+}
+
+/* Custom scrollbar matching cafe theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF7EB;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9955B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B241C;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "The Milkshake Factory",
+  "description": "Sip Happiness. Taste the Magic. Artisanal milkshakes, thickshakes, and fresh fruity delights. Order directly via WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
