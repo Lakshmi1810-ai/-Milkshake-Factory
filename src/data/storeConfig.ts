@@ -30,11 +30,17 @@ export interface StoreConfig {
   instagramUrl: string;
   instagramHandle: string;
   
-  // Ordering details
+  // Ordering & Payment details
   currencySymbol: string;
   minimumOrderForDelivery: number;
   deliveryNotice: string;
   isConfiguredPlaceholder: boolean;
+  upiId: string;
+  upiName: string;
+  accountHolderName: string;
+  upiProvider: string;
+  qrScannerImage: string;
+  upiAppsSupported: string[];
 }
 
 export const STORE_CONFIG: StoreConfig = {
@@ -65,4 +71,12 @@ export const STORE_CONFIG: StoreConfig = {
   minimumOrderForDelivery: 150,
   deliveryNotice: "Free takeaway pickup. Home delivery available within 5 km on WhatsApp orders above ₹150.",
   isConfiguredPlaceholder: false,
+  
+  // Payment Options
+  upiId: "9963206389@upi",
+  upiName: "The Milkshake Factory",
+  accountHolderName: "Manivisetti Lakshmi Sri",
+  upiProvider: "PhonePe",
+  qrScannerImage: "/assets/aistudio/scanner_99305872.jpeg",
+  upiAppsSupported: ["PhonePe", "Google Pay", "Paytm", "BHIM UPI"],
 };

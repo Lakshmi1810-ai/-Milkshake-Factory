@@ -99,14 +99,18 @@ export const Bestsellers: React.FC<BestsellersProps> = ({ onQuickView }) => {
                   <span>Add to Tray</span>
                 </button>
 
-                <button
-                  onClick={() => sendSingleItemWhatsApp(item, 1)}
+                <a
+                  href={`https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(
+                    `🥤 *DIRECT ORDER - ${STORE_CONFIG.brandName.toUpperCase()}*\nItem: *${item.name}* (${item.volume})\nQuantity: 1\nPrice: ₹${item.price}\n\nHello! I would like to order this. Please let me know preparation time.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-[#128C7E] bg-[#E8F8F5] hover:bg-[#D1F2EB] active:scale-95 rounded-lg transition-colors whitespace-nowrap"
                   title="Order directly on WhatsApp"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
                   <span>WhatsApp</span>
-                </button>
+                </a>
               </div>
 
             </div>

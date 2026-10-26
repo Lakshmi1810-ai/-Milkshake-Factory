@@ -108,13 +108,17 @@ export const CombosSection: React.FC = () => {
                     <span>Add to Tray</span>
                   </button>
 
-                  <button
-                    onClick={() => sendComboWhatsApp(combo.title, combo.dealPrice, combo.itemsIncluded)}
+                  <a
+                    href={`https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(
+                      `🥤 *SPECIAL COMBO ORDER - ${STORE_CONFIG.brandName.toUpperCase()}*\n-----------------------------------\nCombo: *${combo.title}*\nIncludes: ${combo.itemsIncluded.join(', ')}\nSpecial Deal Price: *₹${combo.dealPrice}*\n-----------------------------------\nHello! I'd like to order this special combo deal. Please confirm availability.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#128C7E] bg-[#E8F8F5] hover:bg-[#D1F2EB] active:scale-95 rounded-lg transition-colors whitespace-nowrap"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
-                  </button>
+                  </a>
                 </div>
               </div>
 

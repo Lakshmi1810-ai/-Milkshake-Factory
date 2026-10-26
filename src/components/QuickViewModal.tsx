@@ -151,13 +151,18 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ item, onClose })
                 <span>Add {quantity} to Order Tray · {STORE_CONFIG.currencySymbol}{item.price * quantity}</span>
               </button>
 
-              <button
+              <a
+                href={`https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(
+                  `🥤 *DIRECT ORDER - ${STORE_CONFIG.brandName.toUpperCase()}*\nItem: *${item.name}* (${item.volume})\nQuantity: *${quantity}*\nPrice: ₹${item.price} each (Total: *₹${item.price * quantity}*)${customNote ? `\nCustomization: ${customNote}` : ''}\n\nHello! I would like to order this. Please let me know the availability and preparation time.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={handleQuickWhatsApp}
                 className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-[#128C7E] bg-[#E8F8F5] hover:bg-[#D1F2EB] active:scale-98 rounded-xl transition-all"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Order on WhatsApp directly</span>
-              </button>
+              </a>
             </div>
 
           </div>

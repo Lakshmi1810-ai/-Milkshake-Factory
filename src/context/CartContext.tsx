@@ -30,8 +30,14 @@ interface CartContextType {
   setCustomerAddress: (address: string) => void;
   orderType: 'takeaway' | 'delivery';
   setOrderType: (type: 'takeaway' | 'delivery') => void;
+  paymentMethod: 'upi' | 'cash' | 'card';
+  setPaymentMethod: (method: 'upi' | 'cash' | 'card') => void;
+  upiTransactionRef: string;
+  setUpiTransactionRef: (ref: string) => void;
   specialInstructions: string;
   setSpecialInstructions: (note: string) => void;
+  getWhatsAppCartUrl: () => string;
+  getWhatsAppCartMessage: () => string;
   sendWhatsAppCartOrder: () => void;
   sendSingleItemWhatsApp: (item: MenuItem, quantity?: number, note?: string) => void;
   sendComboWhatsApp: (comboTitle: string, dealPrice: number, items: string[]) => void;
@@ -55,6 +61,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [customerName, setCustomerName] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [orderType, setOrderType] = useState<'takeaway' | 'delivery'>('takeaway');
+  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'cash' | 'card'>('upi');
+  const [upiTransactionRef, setUpiTransactionRef] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
 
   useEffect(() => {
@@ -117,9 +125,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Send Full Cart to WhatsApp
-  const sendWhatsAppCartOrder = () => {
-    if (items.length === 0) return;
+  // Build formatted message for cart order
+  const getWhatsAppCartMessage = (): string => {
+    if (items.length === 0) return '';
 
     const lineBreak = '\n';
     let message = `🥤 *NEW ORDER - ${STORE_CONFIG.brandName.toUpperCase()}*${lineBreak}`;
@@ -132,6 +140,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (orderType === 'delivery' && customerAddress.trim()) {
       message += `🏠 *Delivery Address:* ${customerAddress.trim()}${lineBreak}`;
+    }
+
+    const paymentLabel =
+      paymentMethod === 'upi'
+        ? `UPI (Google Pay / PhonePe / Paytm) [ID: ${STORE_CONFIG.upiId}]`
+        : paymentMethod === 'card'
+        ? 'Card / POS Terminal at Counter'
+        : orderType === 'delivery'
+        ? 'Cash on Delivery (COD)'
+        : 'Pay at Store Counter (Cash / UPI)';
+
+    message += `💳 *Payment Method:* ${paymentLabel}${lineBreak}`;
+    if (paymentMethod === 'upi' && upiTransactionRef.trim()) {
+      message += `🔖 *UPI Ref / UTR:* ${upiTransactionRef.trim()}${lineBreak}`;
     }
     
     message += `-----------------------------------${lineBreak}`;
@@ -149,11 +171,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       message += `📝 *Notes / Customization:* ${specialInstructions.trim()}${lineBreak}`;
     }
 
-    message += `${lineBreak}Please confirm this order, estimated preparation time, and payment details. Thank you!`;
+    message += `${lineBreak}Please confirm this order, estimated preparation time, and receipt. Thank you!`;
+    return message;
+  };
 
-    const encoded = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encoded}`;
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  const getWhatsAppCartUrl = (): string => {
+    const message = getWhatsAppCartMessage();
+    if (!message) return `https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}`;
+    return `https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(message)}`;
+  };
+
+  const openWhatsAppUrl = (url: string) => {
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 200);
+    } catch {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // Send Full Cart to WhatsApp
+  const sendWhatsAppCartOrder = () => {
+    if (items.length === 0) return;
+    const url = getWhatsAppCartUrl();
+    openWhatsAppUrl(url);
   };
 
   // Instant single-item WhatsApp Order
@@ -173,9 +223,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     message += `-----------------------------------${lineBreak}`;
     message += `Hello! I would like to order this. Please let me know the availability and preparation time.`;
 
-    const encoded = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encoded}`;
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(message)}`;
+    openWhatsAppUrl(whatsappUrl);
   };
 
   // Instant Combo WhatsApp Order
@@ -189,9 +238,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     message += `-----------------------------------${lineBreak}`;
     message += `Hello! I'd like to order this special combo deal. Please confirm availability and delivery / takeaway details.`;
 
-    const encoded = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encoded}`;
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${STORE_CONFIG.whatsappNumber}&text=${encodeURIComponent(message)}`;
+    openWhatsAppUrl(whatsappUrl);
   };
 
   return (
@@ -212,8 +260,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCustomerAddress,
         orderType,
         setOrderType,
+        paymentMethod,
+        setPaymentMethod,
+        upiTransactionRef,
+        setUpiTransactionRef,
         specialInstructions,
         setSpecialInstructions,
+        getWhatsAppCartUrl,
+        getWhatsAppCartMessage,
         sendWhatsAppCartOrder,
         sendSingleItemWhatsApp,
         sendComboWhatsApp,
